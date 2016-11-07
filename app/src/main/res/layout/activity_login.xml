@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_login"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.zhengdianfang.db.amigodbguide.ui.LoginActivity"
+    tools:ignore="MissingConstraints">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="10.0.2.2"
+        android:ems="10"
+        android:id="@+id/ipEdit"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        app:layout_constraintRight_toRightOf="@+id/usernameEidt"
+        android:layout_marginTop="28dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="@+id/usernameEidt"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:text="数据库IP"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ipTextView"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        android:layout_marginStart="15dp"
+        android:textSize="18sp"
+        android:textColor="#333333"
+        app:layout_constraintBottom_toBottomOf="@+id/ipEdit"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ipEdit"/>
+
+    <TextView
+        android:text="数据库端口"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView2"
+        android:layout_marginStart="16dp"
+        android:textSize="18sp"
+        android:textColor="#333333"
+        app:layout_constraintBaseline_toBaselineOf="@+id/portEdit"
+        tools:layout_constraintBaseline_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:text="用户名"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:layout_marginStart="15dp"
+        android:textSize="18sp"
+        android:textColor="#333333"
+        app:layout_constraintBaseline_toBaselineOf="@+id/usernameEidt"
+        tools:layout_constraintBaseline_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="root"
+        android:ems="10"
+        android:id="@+id/usernameEidt"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginStart="57dp"
+        android:layout_marginEnd="55dp"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toRightOf="@+id/textView3"
+        app:layout_constraintHorizontal_bias="0.42"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/portEdit"/>
+
+    <TextView
+        android:text="密码"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView4"
+        android:textSize="18sp"
+        android:textColor="#333333"
+        android:layout_marginStart="13dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/passwordEdit"
+        tools:layout_constraintBaseline_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passwordEdit"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintRight_toRightOf="@+id/usernameEidt"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/usernameEidt"/>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/portEdit"
+        android:layout_marginStart="30dp"
+        android:text="3306"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toRightOf="@+id/textView2"
+        android:layout_marginTop="32dp"
+        app:layout_constraintTop_toBottomOf="@+id/ipEdit"/>
+
+    <Button
+        android:text="连接"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/connectionButton"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="33dp"
+        android:layout_marginTop="64dp"
+        app:layout_constraintTop_toBottomOf="@+id/passwordEdit"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+</android.support.constraint.ConstraintLayout>
