@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/contentMainView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingTop="8dp"
+        >
+
+        <com.zhengdianfang.db.amigodbguide.ui.RowView
+            android:id="@+id/headerView"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/datasRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:layoutManager="LinearLayoutManager"/>
+
+    </LinearLayout>
+
+</HorizontalScrollView>

@@ -10,6 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.sql.Connection
 import java.sql.DriverManager
+import kotlin.properties.Delegates
 
 
 /**
@@ -17,7 +18,13 @@ import java.sql.DriverManager
 
  * @author zheng
  */
-class DBHelper(val connectionInfo: ConnectionInfo) {
+class DBHelper() {
+
+    companion object{
+        val instance:DBHelper by lazy { DBHelper() }
+    }
+
+    var connectionInfo: ConnectionInfo by Delegates.notNull<ConnectionInfo>()
 
     var conn: Connection? = null
         get() {
@@ -29,11 +36,9 @@ class DBHelper(val connectionInfo: ConnectionInfo) {
             return field
         }
 
-    fun connnection(): Observable<Boolean> {
+    fun connnection(connectionInfo: ConnectionInfo): Observable<Boolean> {
+        this.connectionInfo = connectionInfo
         return Observable.create<Boolean> { sub->
-                Class.forName("com.mysql.jdbc.Driver")//指定连接类型
-                DriverManager.setLoginTimeout(10*1000)
-                conn = DriverManager.getConnection("jdbc:mysql://${connectionInfo.host}:${connectionInfo.port}/", connectionInfo.username, connectionInfo.password)//获取连接
                 sub.onNext(conn != null && conn!!.isClosed.not())
                 sub.onComplete()
         }.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
@@ -44,49 +49,72 @@ class DBHelper(val connectionInfo: ConnectionInfo) {
     /**
      * get all databases name
      */
-    fun getDatabases():MutableList<Database>{
-        val prepareStatement = conn!!.prepareStatement("SHOW DATABASES")
-        val executeQuery = prepareStatement!!.executeQuery()
-        val databasesArray = mutableListOf<Database>()
-        while (executeQuery.next()){
-            val database = Database()
-            database.name = executeQuery.getString(1)
-            databasesArray.add(database)
-        }
-        return databasesArray
+    fun getDatabases(): Observable<MutableList<Database>>? {
+        return Observable.create<MutableList<Database>> { sub->
+            val prepareStatement = conn!!.prepareStatement("SHOW DATABASES")
+            val executeQuery = prepareStatement!!.executeQuery()
+            val databasesArray = mutableListOf<Database>()
+            while (executeQuery.next()){
+                val database = Database()
+                database.name = executeQuery.getString(1)
+                databasesArray.add(database)
+            }
+            sub.onNext(databasesArray)
+            sub.onComplete()
+        }.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     /**
      * select one database
      */
-    fun useDatabase(tableName:String){
-        val prepareStatement = conn!!.prepareStatement("USE $tableName")
-        prepareStatement!!.executeQuery()
+    fun useDatabase(tableName:String): Observable<Boolean>? {
+        return Observable.create<Boolean> {sub->
+            val prepareStatement = conn!!.prepareStatement("USE $tableName")
+            val executeQuery = prepareStatement!!.executeQuery()
+            sub.onNext(executeQuery != null)
+            sub.onComplete()
+        }.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+
     }
 
     /**
      * get all tables name
       */
-    fun getAllTableNames():MutableList<Table>{
-        val prepareStatement = conn!!.prepareStatement("SHOW TABLES")
-        val executeQuery = prepareStatement!!.executeQuery()
-        val tablesArray = mutableListOf<Table>()
-        while (executeQuery.next()){
-            val table = Table()
-            table.name = executeQuery.getString(1)
-            tablesArray.add(table)
-        }
-        return tablesArray
+    fun getAllTableNames(): Observable<MutableList<Table>>? {
+        return Observable.create<MutableList<Table>> {sub->
+            val prepareStatement = conn!!.prepareStatement("SHOW TABLES")
+            val executeQuery = prepareStatement!!.executeQuery()
+            val tablesArray = mutableListOf<Table>()
+            while (executeQuery.next()){
+                val table = Table()
+                table.name = executeQuery.getString(1)
+                tablesArray.add(table)
+            }
+            sub.onNext(tablesArray)
+            sub.onComplete()
+        } .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     /**
      * get table columns name
      */
-    fun getTableColumnNames(tableName: String):MutableList<TableProperty>{
+    fun getTableColumnNames(tableName: String): Observable<MutableList<TableProperty>>? {
+        return Observable.create<MutableList<TableProperty>> { sub->
+            val columnsArray = getTableColunsNames(tableName)
+            sub.onNext(columnsArray)
+            sub.onComplete()
+        }.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    private fun getTableColunsNames(tableName: String): MutableList<TableProperty> {
         val prepareStatement = conn!!.prepareStatement("SHOW COLUMNS FROM $tableName")
         val executeQuery = prepareStatement!!.executeQuery()
         val columnsArray = mutableListOf<TableProperty>()
-        while (executeQuery.next()){
+        while (executeQuery.next()) {
             val tableProperty = TableProperty()
             tableProperty.field = executeQuery.getString(1) ?: ""
             tableProperty.type = executeQuery.getString(2) ?: ""
@@ -99,23 +127,34 @@ class DBHelper(val connectionInfo: ConnectionInfo) {
         return columnsArray
     }
 
-    fun getTableDatas(tableName: String):MutableList<Map<TableProperty, String>>{
-        val tableColumnNames = getTableColumnNames(tableName)
-        val prepareStatement = conn!!.prepareStatement("SELECT * FROM $tableName")
-        val executeQuery = prepareStatement!!.executeQuery()
-        val datas = mutableListOf<Map<TableProperty, String>>()
-        while (executeQuery.next()){
-            val data = mutableMapOf<TableProperty, String>()
-            tableColumnNames.forEach {
-                data.put(it, executeQuery.getString(executeQuery.findColumn(it.field)) ?: "")
+    fun getTableDatas(tableName: String): Observable<MutableList<Map<TableProperty, String>>>? {
+        return Observable.create<MutableList<Map<TableProperty, String>>> { sub->
+            val tableColumnNames = getTableColunsNames(tableName)
+            val prepareStatement = conn!!.prepareStatement("SELECT * FROM $tableName")
+            val executeQuery = prepareStatement!!.executeQuery()
+            val datas = mutableListOf<Map<TableProperty, String>>()
+            while (executeQuery.next()){
+                val data = mutableMapOf<TableProperty, String>()
+                tableColumnNames.forEach {
+                    data.put(it, executeQuery.getString(executeQuery.findColumn(it.field)) ?: "")
+                }
+                datas.add(data)
             }
-            datas.add(data)
-        }
-        return datas
+            sub.onNext(datas)
+            sub.onComplete()
+        }.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun executeSql(sql:String){
         val pst = conn!!.prepareStatement(sql)//准备执行语句
+    }
+
+    fun destory() {
+        if (conn != null && conn!!.isClosed.not()){
+            conn!!.close()
+            conn = null
+        }
     }
 
 
